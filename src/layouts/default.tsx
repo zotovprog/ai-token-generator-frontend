@@ -5,7 +5,7 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex flex-col h-screen">
+    <div className="relative flex flex-col h-full">
       <ThemeSwitch />
       <main className="container mx-auto h-full max-w-xl">{children}</main>
     </div>

@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body,
+body > div,
+body > div > div {
+  height: 100vh;
+}
