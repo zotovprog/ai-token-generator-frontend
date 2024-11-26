@@ -10,31 +10,36 @@ import { useGenerateTokenSSE } from "@/hooks/useGenerateTokenSSE";
 import { TokenCreatorAssistanceResponse } from "@/components/TokenCreatorAssistanceResponse";
 import { ImagePromptCreatorAssistanceResponse } from "@/components/ImagePromptCreatorAssistanceResponse";
 import { MidjourneyProgress } from "@/components/MidjourneyProgress";
+import toast from "react-hot-toast";
 
 export default function IndexPage() {
   const [tokenInput, setTokenInput] = useState("");
-  const [topicName, setTopicName] = useState("");
+  const [imageStyle, setImageStyle] = useState("");
 
   const {
     firstAssistantData,
     secondAssistantData,
-    finalAssistantData,
     midjourneyProgress,
     midjourneyImageUrl,
     isPending,
-  } = useGenerateTokenSSE(topicName);
+    fetchData,
+  } = useGenerateTokenSSE(tokenInput, imageStyle);
 
   const updateTokenInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTokenInput(e.target.value);
   };
 
+  const updateImageStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageStyle(e.target.value);
+  };
+
   const onGenerateHandler = () => {
-    setTopicName(tokenInput);
+    fetchData();
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      // Optionally show a toast notification
+      toast.success("Copied to clipboard!");
     });
   };
 
@@ -43,14 +48,21 @@ export default function IndexPage() {
       <section className="flex flex-col items-center justify-center py-12 gap-6">
         <h1 className="text-4xl">AI Token Generator</h1>
         <div className="flex gap-2 items-center w-full">
-          <Input
-            label="Type topic, keywords or description"
-            value={tokenInput}
-            onChange={updateTokenInput}
-          />
+          <div className="flex w-full flex-col gap-4">
+            <Input
+              label="Type topic, keywords or description"
+              value={tokenInput}
+              onChange={updateTokenInput}
+            />
+            <Input
+              label="Describe image style"
+              value={imageStyle}
+              onChange={updateImageStyle}
+            />
+          </div>
           <Button
             color="primary"
-            disabled={isPending || tokenInput === ""}
+            disabled={isPending || tokenInput === "" || imageStyle === ""}
             onClick={onGenerateHandler}
           >
             Generate
@@ -59,29 +71,22 @@ export default function IndexPage() {
         <section className="flex flex-col gap-5">
           {firstAssistantData && (
             <TokenCreatorAssistanceResponse
-              data={firstAssistantData}
               copyToClipboard={copyToClipboard}
+              data={firstAssistantData}
             />
           )}
 
           {secondAssistantData && (
             <ImagePromptCreatorAssistanceResponse
-              title="AI Token Logo Prompt Creator Response"
               response={secondAssistantData}
-            />
-          )}
-
-          {finalAssistantData && (
-            <ImagePromptCreatorAssistanceResponse
-              title="AI Token Logo Prompt Verificator Response"
-              response={finalAssistantData}
+              title="AI Token Logo Prompt Creator Response"
             />
           )}
 
           {midjourneyProgress && (
             <MidjourneyProgress
-              progress={midjourneyProgress}
               imageUrl={midjourneyImageUrl}
+              progress={midjourneyProgress}
             />
           )}
 
